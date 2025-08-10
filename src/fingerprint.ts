@@ -203,17 +203,17 @@ export class TestFingerprinter {
       .digest('hex')
   }
 
-  private walkAst(node: any, callback: (node: any) => void): void {
-    if (!node || typeof node !== 'object') return
+  private walkAst(_node: any, callback: (_node: any) => void): void {
+    if (!_node || typeof _node !== 'object') return
 
-    callback(node)
+    callback(_node)
 
-    if (Array.isArray(node)) {
-      for (const item of node) {
+    if (Array.isArray(_node)) {
+      for (const item of _node) {
         this.walkAst(item, callback)
       }
     } else {
-      for (const value of Object.values(node)) {
+      for (const value of Object.values(_node)) {
         this.walkAst(value, callback)
       }
     }

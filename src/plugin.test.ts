@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { unlinkSync, existsSync } from 'fs'
 import testIdPlugin, { PluginOptions } from './plugin'
-import type { File, Test, Suite } from 'vitest'
+import type { File, Test } from 'vitest'
 
 // Mock dependencies
 vi.mock('fs', async () => {
@@ -207,8 +207,6 @@ describe('testIdPlugin', () => {
 
       // Mock some assigned UUIDs (would normally be set during processing)
       // We'll access the internal state through a workaround
-      const uuid1 = 'uuid-1'
-      const uuid2 = 'uuid-2'
 
       // Simulate plugin finishing
       await plugin.onFinished?.([])

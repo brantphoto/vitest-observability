@@ -226,7 +226,7 @@ describe('TestMatcher', () => {
       }
 
       // Add first test
-      const uuid1 = matcher.assignUuid(testFn1, 'same.test.js::same_test')
+      matcher.assignUuid(testFn1, 'same.test.js::same_test')
       
       // Check similarity with identical node ID
       const details = matcher.getMatchDetails(testFn2, 'same.test.js::same_test')
@@ -280,7 +280,7 @@ describe('TestMatcher', () => {
       }
 
       // Add short test
-      const shortUuid = matcher.assignUuid(shortTestFn, 'test.js::short_test')
+      matcher.assignUuid(shortTestFn, 'test.js::short_test')
 
       // Check similarity of medium test (closer in length) vs long test (very different length)
       const mediumDetails = matcher.getMatchDetails(mediumTestFn, 'test.js::medium_test')
