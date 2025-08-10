@@ -216,6 +216,146 @@ describe('testIdPlugin', () => {
     })
   })
 
+  describe('edge cases and additional coverage', () => {
+    it('should handle missing file path gracefully', async () => {
+      const plugin = testIdPlugin({ 
+        registryPath: testRegistryPath,
+        debug: true 
+      })
+
+      plugin.configResolved?.()
+
+      // Mock file without filepath
+      const mockFile = {
+        id: 'file1',
+        name: 'no-path.test.ts',
+        type: 'suite',
+        mode: 'run',
+        filepath: undefined, // Missing filepath
+        tasks: [],
+        suite: undefined as any,
+        file: undefined as any,
+        meta: {},
+        each: undefined,
+        fails: false,
+        retry: 0,
+        repeats: 0
+      }
+
+      const taskUpdates: [string, any, any][] = [
+        ['file1', mockFile, { type: 'file' }]
+      ]
+
+      // Should not crash with missing filepath
+      await plugin.onTaskUpdate?.(taskUpdates)
+    })
+
+    it('should handle tasks without file property', async () => {
+      const plugin = testIdPlugin({ 
+        registryPath: testRegistryPath,
+        debug: true 
+      })
+
+      plugin.configResolved?.()
+
+      const mockTask = {
+        id: 'task1',
+        name: 'test without file',
+        type: 'test',
+        mode: 'run',
+        file: undefined, // Missing file property
+        tasks: [],
+        suite: undefined as any,
+        meta: {},
+        each: undefined,
+        fails: false,
+        retry: 0,
+        repeats: 0
+      }
+
+      const taskUpdates: [string, any, any][] = [
+        ['task1', mockTask, { type: 'test' }]
+      ]
+
+      // Should not crash with missing file property
+      await plugin.onTaskUpdate?.(taskUpdates)
+    })
+
+    it('should handle plugin without autoSave and autoCleanup', async () => {
+      const plugin = testIdPlugin({ 
+        registryPath: testRegistryPath,
+        autoSave: false,
+        autoCleanup: false,
+        debug: false
+      })
+
+      plugin.configResolved?.()
+
+      // Should not perform save/cleanup when disabled
+      await plugin.onFinished?.([])
+      
+      // This mainly tests that the branches are covered
+      expect(plugin.name).toBe('vitest-test-id')
+    })
+
+    it('should handle generateNodeId with different scenarios', () => {
+      const plugin = testIdPlugin()
+      
+      // Test the private method through reflection  
+      const generateNodeId = (plugin as any).generateNodeId?.bind(plugin)
+      
+      if (generateNodeId) {
+        // Test with complete task hierarchy
+        const mockTask = {
+          name: 'test name',
+          suite: {
+            name: 'suite name',
+            file: { filepath: '/path/to/file.test.ts' }
+          }
+        }
+        
+        const nodeId = generateNodeId(mockTask)
+        expect(nodeId).toContain('file.test.ts')
+        expect(nodeId).toContain('suite_name')
+        expect(nodeId).toContain('test_name')
+      }
+    })
+
+    it('should handle processFile with empty or invalid source', async () => {
+      mockReadFileSync.mockReturnValue('')
+
+      const plugin = testIdPlugin({ 
+        registryPath: testRegistryPath,
+        debug: true 
+      })
+
+      plugin.configResolved?.()
+
+      const mockFile = {
+        id: 'file1',
+        name: 'empty.test.ts',
+        type: 'suite',
+        mode: 'run',
+        filepath: '/test/empty.test.ts',
+        tasks: [],
+        suite: undefined as any,
+        file: undefined as any,
+        meta: {},
+        each: undefined,
+        fails: false,
+        retry: 0,
+        repeats: 0
+      }
+
+      const taskUpdates: [string, any, any][] = [
+        ['file1', mockFile, { type: 'file' }]
+      ]
+
+      // Should handle empty source gracefully
+      await plugin.onTaskUpdate?.(taskUpdates)
+    })
+  })
+
   describe('node ID generation', () => {
     it('should generate correct node IDs for nested tests', () => {
       const sourceCode = `

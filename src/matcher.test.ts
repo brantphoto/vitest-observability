@@ -259,6 +259,84 @@ describe('TestMatcher', () => {
     })
   })
 
+  describe('edge cases and additional coverage', () => {
+    it('should handle empty registry in fuzzy matching', () => {
+      const testFn = {
+        name: 'test',
+        body: '{ expect(1).toBe(1) }',
+        source: ''
+      }
+
+      // No tests in registry - should return null
+      const match = matcher.findMatch(testFn, 'test.js::test')
+      expect(match).toBeNull()
+    })
+
+    it('should find exact matches when available', () => {
+      const testFn1 = {
+        name: 'test1',
+        body: '{ expect(1).toBe(1) }',
+        source: ''
+      }
+
+      // Add the test
+      const uuid1 = matcher.assignUuid(testFn1, 'test.js::test1')
+
+      // Try to find match for exact same test - should find exact match
+      const match = matcher.findMatch(testFn1, 'test.js::test1')
+      expect(match).not.toBeNull()
+      expect(match?.isExactMatch).toBe(true)
+      expect(match?.uuid).toBe(uuid1)
+      expect(match?.confidence).toBe(1.0)
+    })
+
+    it('should handle extractTestNameFromNodeId with different formats', () => {
+      const matcher = new TestMatcher(fingerprinter, registry)
+      
+      // Test the private method through reflection
+      const extractTestName = (matcher as any).extractTestNameFromNodeId.bind(matcher)
+
+      // Test :: format
+      expect(extractTestName('file.test.js::snake_case_test')).toBe('snake case test')
+      expect(extractTestName('file.test.js::camelCaseTest')).toBe('camel Case Test')
+      
+      // Test > format
+      expect(extractTestName('file.test.js > describe block > test name')).toBe('test name')
+      
+      // Test no match
+      expect(extractTestName('no-separators')).toBeNull()
+    })
+
+    it('should handle getMatchDetails with no candidates', () => {
+      const testFn = {
+        name: 'lonely test',
+        body: '{ expect(true).toBe(true) }',
+        source: ''
+      }
+
+      const details = matcher.getMatchDetails(testFn, 'test.js::lonely_test')
+      expect(details.match).toBeNull()
+      expect(details.candidates).toHaveLength(0)
+    })
+
+    it('should handle exact hash match in getMatchDetails', () => {
+      const testFn = {
+        name: 'exact match test',
+        body: '{ expect(true).toBe(true) }',
+        source: ''
+      }
+
+      // Add the test first
+      const uuid = matcher.assignUuid(testFn, 'test.js::exact_match')
+
+      // Get details for same test - should find exact match
+      const details = matcher.getMatchDetails(testFn, 'test.js::exact_match')
+      expect(details.match?.isExactMatch).toBe(true)
+      expect(details.match?.uuid).toBe(uuid)
+      expect(details.candidates).toHaveLength(0) // No fuzzy candidates for exact match
+    })
+  })
+
   describe('body length similarity', () => {
     it('should consider body length in similarity calculation', () => {
       const shortTestFn = {

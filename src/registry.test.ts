@@ -114,6 +114,52 @@ describe('TestRegistry', () => {
     })
   })
 
+  describe('error handling and edge cases', () => {
+    it('should handle corrupted registry file gracefully', () => {
+      const corruptRegistryPath = '.test-corrupt-registry.json'
+      
+      // Write corrupted JSON to file
+      require('fs').writeFileSync(corruptRegistryPath, '{ invalid json content')
+      
+      // Should not crash on loading corrupted file
+      const corruptRegistry = new TestRegistry(corruptRegistryPath)
+      expect(corruptRegistry.size()).toBe(0)
+      
+      // Cleanup
+      if (existsSync(corruptRegistryPath)) {
+        unlinkSync(corruptRegistryPath)
+      }
+    })
+
+    it('should handle missing registry file gracefully', () => {
+      const missingPath = '.test-missing-registry.json'
+      
+      // Ensure file doesn't exist
+      if (existsSync(missingPath)) {
+        unlinkSync(missingPath)
+      }
+      
+      // Should not crash on loading missing file
+      const missingRegistry = new TestRegistry(missingPath)
+      expect(missingRegistry.size()).toBe(0)
+      
+      // Should be able to add entries
+      const uuid = missingRegistry.add('test-hash', 'test-node', 42)
+      expect(uuid).toMatch(/^[0-9a-f-]{36}$/)
+    })
+
+    it('should handle save error gracefully', () => {
+      // Try to save to an invalid path (directory doesn't exist)
+      const invalidPath = '/nonexistent/directory/registry.json'
+      const errorRegistry = new TestRegistry(invalidPath)
+      
+      errorRegistry.add('test-hash', 'test-node', 42)
+      
+      // Should not crash when trying to save to invalid path
+      expect(() => errorRegistry.save()).not.toThrow()
+    })
+  })
+
   describe('utility methods', () => {
     it('should return all entries', () => {
       registry.add('hash1', 'test1', 10)

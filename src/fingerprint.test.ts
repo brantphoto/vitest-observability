@@ -224,4 +224,95 @@ describe('TestFingerprinter', () => {
       expect(hash).toMatch(/^[a-f0-9]{64}$/) // SHA256 is 64 chars
     })
   })
+
+  describe('additional edge cases', () => {
+    it('should handle tests with non-string names', () => {
+      const source = `
+        test(123, () => { expect(true).toBe(true) })
+      `
+      
+      const tests = fingerprinter.extractTestFunctions(source)
+      expect(tests).toHaveLength(0) // Should skip non-string names
+    })
+
+    it('should handle tests without function arguments', () => {
+      const source = `
+        test('no function')
+      `
+      
+      const tests = fingerprinter.extractTestFunctions(source)
+      expect(tests).toHaveLength(0) // Should skip tests without function
+    })
+
+    it('should handle tests with non-function second argument', () => {
+      const source = `
+        test('not a function', 'this is a string')
+      `
+      
+      const tests = fingerprinter.extractTestFunctions(source)
+      expect(tests).toHaveLength(0) // Should skip tests with non-function
+    })
+
+    it('should handle edge cases in test extraction', () => {
+      // Test with various edge cases that would cause null returns
+      const source = `
+        // This should not be extracted
+        test(null, () => {})
+        // Neither should this  
+        test('valid', null)
+      `
+      
+      const tests = fingerprinter.extractTestFunctions(source)
+      expect(tests).toHaveLength(0) // Should skip invalid tests
+    })
+
+    it('should handle AST normalization with preserveVariableNames option', () => {
+      const fingerprinter = new TestFingerprinter({ preserveVariableNames: true })
+      const source = `
+        test('preserve variables', () => {
+          const myVariable = 'value'
+          expect(myVariable).toBe('value')
+        })
+      `
+      
+      const tests = fingerprinter.extractTestFunctions(source)
+      expect(tests).toHaveLength(1)
+      
+      const hash1 = fingerprinter.fingerprintTest(tests[0])
+      
+      // Same test with different variable name - should produce different hash when preserving names
+      const source2 = `
+        test('preserve variables', () => {
+          const differentVariable = 'value'
+          expect(differentVariable).toBe('value')
+        })
+      `
+      
+      const tests2 = fingerprinter.extractTestFunctions(source2)
+      const hash2 = fingerprinter.fingerprintTest(tests2[0])
+      
+      expect(hash1).not.toBe(hash2) // Should be different when preserving variable names
+    })
+
+    it('should handle normalizeIdentifier with preserved names', () => {
+      const fingerprinter = new TestFingerprinter({ preserveVariableNames: false })
+      
+      // Test the private method through reflection
+      const normalizeIdentifier = (fingerprinter as any).normalizeIdentifier.bind(fingerprinter)
+      
+      // Preserved names should stay the same
+      expect(normalizeIdentifier('expect')).toBe('expect')
+      expect(normalizeIdentifier('test')).toBe('test')
+      expect(normalizeIdentifier('console')).toBe('console')
+      
+      // Non-preserved names should be normalized to hash format
+      const normalized1 = normalizeIdentifier('myVariable')
+      const normalized2 = normalizeIdentifier('anotherVar')
+      
+      expect(normalized1).toMatch(/^_var_[a-f0-9]{8}$/)
+      expect(normalized2).toMatch(/^_var_[a-f0-9]{8}$/)
+      expect(normalized1).not.toBe(normalized2) // Different variables get different hashes
+      expect(normalizeIdentifier('myVariable')).toBe(normalized1) // Should be consistent
+    })
+  })
 })
