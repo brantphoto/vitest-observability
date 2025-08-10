@@ -25,8 +25,9 @@ describe('TestRegistry', () => {
     it('should add new test entry and find it by hash', () => {
       const hash = 'abc123'
       const nodeId = 'test.js::my_test'
+      const bodyLength = 42
       
-      const uuid = registry.add(hash, nodeId)
+      const uuid = registry.add(hash, nodeId, bodyLength)
       
       expect(uuid).toMatch(/^[0-9a-f-]{36}$/) // UUID format
       
@@ -35,6 +36,7 @@ describe('TestRegistry', () => {
         uuid,
         hash,
         lastNodeId: nodeId,
+        bodyLength,
         createdAt: expect.any(Number),
         lastSeen: expect.any(Number)
       })
@@ -43,12 +45,14 @@ describe('TestRegistry', () => {
     it('should find entry by UUID', () => {
       const hash = 'def456'
       const nodeId = 'test.js::another_test'
+      const bodyLength = 100
       
-      const uuid = registry.add(hash, nodeId)
+      const uuid = registry.add(hash, nodeId, bodyLength)
       const entry = registry.findByUuid(uuid)
       
       expect(entry?.hash).toBe(hash)
       expect(entry?.lastNodeId).toBe(nodeId)
+      expect(entry?.bodyLength).toBe(bodyLength)
     })
 
     it('should return undefined for non-existent hash', () => {
@@ -68,21 +72,24 @@ describe('TestRegistry', () => {
       const updatedHash = 'hash2'
       const originalNodeId = 'test1.js::test'
       const updatedNodeId = 'test2.js::test'
+      const originalBodyLength = 50
+      const updatedBodyLength = 75
       
-      const uuid = registry.add(originalHash, originalNodeId)
+      const uuid = registry.add(originalHash, originalNodeId, originalBodyLength)
       const originalTime = registry.findByUuid(uuid)?.lastSeen
       
-      registry.update(uuid, updatedHash, updatedNodeId)
+      registry.update(uuid, updatedHash, updatedNodeId, updatedBodyLength)
       
       const entry = registry.findByUuid(uuid)
       expect(entry?.hash).toBe(updatedHash)
       expect(entry?.lastNodeId).toBe(updatedNodeId)
+      expect(entry?.bodyLength).toBe(updatedBodyLength)
       expect(entry?.lastSeen).toBeGreaterThanOrEqual(originalTime!)
     })
 
     it('should not crash when updating non-existent UUID', () => {
       expect(() => {
-        registry.update('non-existent', 'hash', 'nodeId')
+        registry.update('non-existent', 'hash', 'nodeId', 50)
       }).not.toThrow()
     })
   })
@@ -91,8 +98,9 @@ describe('TestRegistry', () => {
     it('should persist and load registry data', () => {
       const hash = 'persistent-hash'
       const nodeId = 'persistent.test.js::test'
+      const bodyLength = 200
       
-      const uuid = registry.add(hash, nodeId)
+      const uuid = registry.add(hash, nodeId, bodyLength)
       registry.save()
       
       // Create new registry instance to test loading
@@ -102,22 +110,23 @@ describe('TestRegistry', () => {
       expect(entry?.uuid).toBe(uuid)
       expect(entry?.hash).toBe(hash)
       expect(entry?.lastNodeId).toBe(nodeId)
+      expect(entry?.bodyLength).toBe(bodyLength)
     })
   })
 
   describe('utility methods', () => {
     it('should return all entries', () => {
-      registry.add('hash1', 'test1')
-      registry.add('hash2', 'test2')
+      registry.add('hash1', 'test1', 10)
+      registry.add('hash2', 'test2', 20)
       
       const entries = registry.getAllEntries()
       expect(entries).toHaveLength(2)
-      expect(entries.every(e => e.uuid && e.hash && e.lastNodeId)).toBe(true)
+      expect(entries.every(e => e.uuid && e.hash && e.lastNodeId && typeof e.bodyLength === 'number')).toBe(true)
     })
 
     it('should return all hashes', () => {
-      registry.add('hash1', 'test1')
-      registry.add('hash2', 'test2')
+      registry.add('hash1', 'test1', 10)
+      registry.add('hash2', 'test2', 20)
       
       const hashes = registry.getAllHashes()
       expect(hashes).toEqual(['hash1', 'hash2'])
@@ -126,17 +135,17 @@ describe('TestRegistry', () => {
     it('should return correct size', () => {
       expect(registry.size()).toBe(0)
       
-      registry.add('hash1', 'test1')
+      registry.add('hash1', 'test1', 10)
       expect(registry.size()).toBe(1)
       
-      registry.add('hash2', 'test2')
+      registry.add('hash2', 'test2', 20)
       expect(registry.size()).toBe(2)
     })
 
     it('should cleanup inactive UUIDs', () => {
-      const uuid1 = registry.add('hash1', 'test1')
-      const uuid2 = registry.add('hash2', 'test2')
-      const uuid3 = registry.add('hash3', 'test3')
+      const uuid1 = registry.add('hash1', 'test1', 10)
+      const uuid2 = registry.add('hash2', 'test2', 20)
+      const uuid3 = registry.add('hash3', 'test3', 30)
       
       expect(registry.size()).toBe(3)
       

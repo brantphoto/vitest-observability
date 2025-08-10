@@ -58,7 +58,6 @@ export class TestMatcher {
    * Find fuzzy matches using similarity comparison
    */
   private findFuzzyMatch(testFunction: TestFunction, newHash: string, nodeId: string): MatchResult | null {
-    const normalizedNewCode = this.fingerprinter['normalizeTestBody'](testFunction.body)
     const allEntries = this.registry.getAllEntries()
     
     if (allEntries.length === 0) {
@@ -111,17 +110,25 @@ export class TestMatcher {
     let similarity = 0
     let totalWeight = 0
 
-    // Factor 1: Node ID similarity (file path + test name structure)
+    // Factor 1: Node ID similarity (file path + test structure) - 50%
     const nodeIdSimilarity = this.calculateLevenshteinSimilarity(nodeId, entry.lastNodeId)
     similarity += nodeIdSimilarity * 0.5
     totalWeight += 0.5
 
-    // Factor 2: Test name similarity - extract names and compare
+    // Factor 2: Test name similarity - 30%
     const testName = testFunction.name
     const existingTestName = this.extractTestNameFromNodeId(entry.lastNodeId) || testName
     const nameSimilarity = this.calculateLevenshteinSimilarity(testName, existingTestName)
-    similarity += nameSimilarity * 0.5
-    totalWeight += 0.5
+    similarity += nameSimilarity * 0.3
+    totalWeight += 0.3
+
+    // Factor 3: Body length similarity (proxy for content complexity) - 20%
+    const bodyLengthSimilarity = this.calculateLengthSimilarity(
+      testFunction.body.length,
+      entry.bodyLength
+    )
+    similarity += bodyLengthSimilarity * 0.2
+    totalWeight += 0.2
 
     return totalWeight > 0 ? similarity / totalWeight : 0
   }
@@ -198,15 +205,16 @@ export class TestMatcher {
    */
   assignUuid(testFunction: TestFunction, nodeId: string): string {
     const matchResult = this.findMatch(testFunction, nodeId)
+    const bodyLength = testFunction.body.length
     
     if (matchResult) {
-      // Update existing entry with new hash and node ID
-      this.registry.update(matchResult.uuid, matchResult.newHash, nodeId)
+      // Update existing entry with new hash, node ID, and body length
+      this.registry.update(matchResult.uuid, matchResult.newHash, nodeId, bodyLength)
       return matchResult.uuid
     } else {
       // Create new entry
       const newHash = this.fingerprinter.fingerprintTest(testFunction)
-      return this.registry.add(newHash, nodeId)
+      return this.registry.add(newHash, nodeId, bodyLength)
     }
   }
 
@@ -235,7 +243,6 @@ export class TestMatcher {
     }
 
     // Get fuzzy match candidates
-    const normalizedNewCode = this.fingerprinter['normalizeTestBody'](testFunction.body)
     const allEntries = this.registry.getAllEntries()
     
     const candidates: Array<{ entry: TestEntry; similarity: number }> = []

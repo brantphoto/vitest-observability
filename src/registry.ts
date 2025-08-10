@@ -6,6 +6,7 @@ export interface TestEntry {
   uuid: string
   hash: string
   lastNodeId: string
+  bodyLength: number
   createdAt: number
   lastSeen: number
 }
@@ -58,13 +59,14 @@ export class TestRegistry {
     return entry ? { uuid, ...entry } : undefined
   }
 
-  add(hash: string, nodeId: string): string {
+  add(hash: string, nodeId: string, bodyLength: number): string {
     const uuid = randomUUID()
     const now = Date.now()
     
     this.registry[uuid] = {
       hash,
       lastNodeId: nodeId,
+      bodyLength,
       createdAt: now,
       lastSeen: now
     }
@@ -72,11 +74,12 @@ export class TestRegistry {
     return uuid
   }
 
-  update(uuid: string, hash: string, nodeId: string): void {
+  update(uuid: string, hash: string, nodeId: string, bodyLength: number): void {
     const entry = this.registry[uuid]
     if (entry) {
       entry.hash = hash
       entry.lastNodeId = nodeId
+      entry.bodyLength = bodyLength
       entry.lastSeen = Date.now()
     }
   }
