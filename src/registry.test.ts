@@ -1,0 +1,153 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { unlinkSync, existsSync } from 'fs'
+import { TestRegistry } from './registry'
+
+describe('TestRegistry', () => {
+  const testRegistryPath = '.test-registry-test.json'
+  let registry: TestRegistry
+
+  beforeEach(() => {
+    // Clean up any existing test file
+    if (existsSync(testRegistryPath)) {
+      unlinkSync(testRegistryPath)
+    }
+    registry = new TestRegistry(testRegistryPath)
+  })
+
+  afterEach(() => {
+    // Clean up test file
+    if (existsSync(testRegistryPath)) {
+      unlinkSync(testRegistryPath)
+    }
+  })
+
+  describe('add and find', () => {
+    it('should add new test entry and find it by hash', () => {
+      const hash = 'abc123'
+      const nodeId = 'test.js::my_test'
+      
+      const uuid = registry.add(hash, nodeId)
+      
+      expect(uuid).toMatch(/^[0-9a-f-]{36}$/) // UUID format
+      
+      const entry = registry.findByHash(hash)
+      expect(entry).toEqual({
+        uuid,
+        hash,
+        lastNodeId: nodeId,
+        createdAt: expect.any(Number),
+        lastSeen: expect.any(Number)
+      })
+    })
+
+    it('should find entry by UUID', () => {
+      const hash = 'def456'
+      const nodeId = 'test.js::another_test'
+      
+      const uuid = registry.add(hash, nodeId)
+      const entry = registry.findByUuid(uuid)
+      
+      expect(entry?.hash).toBe(hash)
+      expect(entry?.lastNodeId).toBe(nodeId)
+    })
+
+    it('should return undefined for non-existent hash', () => {
+      const entry = registry.findByHash('nonexistent')
+      expect(entry).toBeUndefined()
+    })
+
+    it('should return undefined for non-existent UUID', () => {
+      const entry = registry.findByUuid('non-existent-uuid')
+      expect(entry).toBeUndefined()
+    })
+  })
+
+  describe('update', () => {
+    it('should update existing entry', () => {
+      const originalHash = 'hash1'
+      const updatedHash = 'hash2'
+      const originalNodeId = 'test1.js::test'
+      const updatedNodeId = 'test2.js::test'
+      
+      const uuid = registry.add(originalHash, originalNodeId)
+      const originalTime = registry.findByUuid(uuid)?.lastSeen
+      
+      registry.update(uuid, updatedHash, updatedNodeId)
+      
+      const entry = registry.findByUuid(uuid)
+      expect(entry?.hash).toBe(updatedHash)
+      expect(entry?.lastNodeId).toBe(updatedNodeId)
+      expect(entry?.lastSeen).toBeGreaterThanOrEqual(originalTime!)
+    })
+
+    it('should not crash when updating non-existent UUID', () => {
+      expect(() => {
+        registry.update('non-existent', 'hash', 'nodeId')
+      }).not.toThrow()
+    })
+  })
+
+  describe('persistence', () => {
+    it('should persist and load registry data', () => {
+      const hash = 'persistent-hash'
+      const nodeId = 'persistent.test.js::test'
+      
+      const uuid = registry.add(hash, nodeId)
+      registry.save()
+      
+      // Create new registry instance to test loading
+      const newRegistry = new TestRegistry(testRegistryPath)
+      const entry = newRegistry.findByHash(hash)
+      
+      expect(entry?.uuid).toBe(uuid)
+      expect(entry?.hash).toBe(hash)
+      expect(entry?.lastNodeId).toBe(nodeId)
+    })
+  })
+
+  describe('utility methods', () => {
+    it('should return all entries', () => {
+      registry.add('hash1', 'test1')
+      registry.add('hash2', 'test2')
+      
+      const entries = registry.getAllEntries()
+      expect(entries).toHaveLength(2)
+      expect(entries.every(e => e.uuid && e.hash && e.lastNodeId)).toBe(true)
+    })
+
+    it('should return all hashes', () => {
+      registry.add('hash1', 'test1')
+      registry.add('hash2', 'test2')
+      
+      const hashes = registry.getAllHashes()
+      expect(hashes).toEqual(['hash1', 'hash2'])
+    })
+
+    it('should return correct size', () => {
+      expect(registry.size()).toBe(0)
+      
+      registry.add('hash1', 'test1')
+      expect(registry.size()).toBe(1)
+      
+      registry.add('hash2', 'test2')
+      expect(registry.size()).toBe(2)
+    })
+
+    it('should cleanup inactive UUIDs', () => {
+      const uuid1 = registry.add('hash1', 'test1')
+      const uuid2 = registry.add('hash2', 'test2')
+      const uuid3 = registry.add('hash3', 'test3')
+      
+      expect(registry.size()).toBe(3)
+      
+      // Keep only uuid1 and uuid3
+      const removed = registry.cleanup([uuid1, uuid3])
+      
+      expect(removed).toBe(1)
+      expect(registry.size()).toBe(2)
+      expect(registry.findByUuid(uuid1)).toBeDefined()
+      expect(registry.findByUuid(uuid2)).toBeUndefined()
+      expect(registry.findByUuid(uuid3)).toBeDefined()
+    })
+  })
+})
