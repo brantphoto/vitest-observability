@@ -1,0 +1,16 @@
+{
+  "name": "@vitest-testid-plugin/examples",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "vitest-testid-plugin": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vitest": "^1.6.1"
+  }
+}

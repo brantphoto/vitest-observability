@@ -1,63 +1,20 @@
 {
-  "name": "vitest-testid-plugin",
-  "version": "0.1.0",
-  "description": "Vitest plugin for persistent test identity tracking using content fingerprints",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "bin": {
-    "vitest-testid": "./dist/cli.js"
-  },
-  "files": [
-    "dist"
-  ],
+  "private": true,
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "prepublishOnly": "npm run build"
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
-  "keywords": [
-    "vitest",
-    "plugin",
-    "test",
-    "identity",
-    "uuid",
-    "fingerprint",
-    "analytics"
-  ],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@changesets/cli": "^2.26.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "eslint": "^8.0.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0"
-  },
-  "dependencies": {
-    "acorn": "^8.11.0",
-    "commander": "^11.0.0"
-  },
-  "peerDependencies": {
-    "vitest": ">=1.0.0"
-  },
-  "engines": {
-    "node": ">=18"
+    "eslint": "^8.0.0"
   },
   "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
 }
