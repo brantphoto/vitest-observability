@@ -5,6 +5,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -21,8 +22,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
+    "test": "vitest --run",
+    "test:coverage": "vitest --coverage --run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
@@ -41,12 +42,14 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/acorn": "^4.0.6",
     "@vitest/coverage-v8": "^1.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   },
   "dependencies": {
+    "@vitest-testid/types": "workspace:*",
     "acorn": "^8.11.0",
     "commander": "^11.0.0"
   },

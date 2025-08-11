@@ -35,9 +35,10 @@ describe('TestRegistry', () => {
       expect(entry).toEqual({
         uuid,
         hash,
+        nodeId,
         lastNodeId: nodeId,
         bodyLength,
-        createdAt: expect.any(Number),
+        timestamp: expect.any(Number),
         lastSeen: expect.any(Number)
       })
     })

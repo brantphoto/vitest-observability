@@ -1,16 +1,7 @@
 import { parse } from 'acorn'
 import { createHash } from 'crypto'
 
-export interface TestFunction {
-  name: string
-  body: string
-  source: string
-}
-
-export interface FingerprintOptions {
-  hashAlgorithm?: 'sha1' | 'sha256'
-  preserveVariableNames?: boolean
-}
+import type { TestFunction, FingerprintOptions } from '@vitest-testid/types'
 
 export class TestFingerprinter {
   private options: Required<FingerprintOptions>

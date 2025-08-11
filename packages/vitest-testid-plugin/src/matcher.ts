@@ -1,18 +1,6 @@
-import { TestFunction, TestFingerprinter } from './fingerprint'
-import { TestRegistry, TestEntry } from './registry'
-
-export interface MatchResult {
-  uuid: string
-  confidence: number
-  existingHash: string
-  newHash: string
-  isExactMatch: boolean
-}
-
-export interface MatcherOptions {
-  similarityThreshold: number // 0-1, minimum similarity score for fuzzy matching
-  maxCandidates: number // Maximum number of candidates to consider for fuzzy matching
-}
+import { TestFingerprinter } from './fingerprint'
+import { TestRegistry } from './registry'
+import type { TestFunction, TestEntry, MatchResult, MatcherOptions } from '@vitest-testid/types'
 
 export class TestMatcher {
   private fingerprinter: TestFingerprinter
@@ -111,13 +99,13 @@ export class TestMatcher {
     let totalWeight = 0
 
     // Factor 1: Node ID similarity (file path + test structure) - 50%
-    const nodeIdSimilarity = this.calculateLevenshteinSimilarity(nodeId, entry.lastNodeId)
+    const nodeIdSimilarity = this.calculateLevenshteinSimilarity(nodeId, entry.lastNodeId || entry.nodeId)
     similarity += nodeIdSimilarity * 0.5
     totalWeight += 0.5
 
     // Factor 2: Test name similarity - 30%
     const testName = testFunction.name
-    const existingTestName = this.extractTestNameFromNodeId(entry.lastNodeId) || testName
+    const existingTestName = this.extractTestNameFromNodeId(entry.lastNodeId || entry.nodeId) || testName
     const nameSimilarity = this.calculateLevenshteinSimilarity(testName, existingTestName)
     similarity += nameSimilarity * 0.3
     totalWeight += 0.3

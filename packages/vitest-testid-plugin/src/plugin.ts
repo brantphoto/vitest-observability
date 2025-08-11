@@ -1,44 +1,11 @@
-import type { File, Task, Test, Suite } from 'vitest'
+import type { Test, Suite, File, Task } from 'vitest'
 import { readFileSync } from 'fs'
-import { TestFingerprinter, FingerprintOptions } from './fingerprint'
+import { TestFingerprinter } from './fingerprint'
 import { TestRegistry } from './registry'
-import { TestMatcher, MatcherOptions } from './matcher'
+import { TestMatcher } from './matcher'
+import type { TestIdPluginOptions } from '@vitest-testid/types'
 
-export interface PluginOptions {
-  /**
-   * Path to the test registry file
-   * @default '.test-ids.json'
-   */
-  registryPath?: string
-
-  /**
-   * Options for test fingerprinting
-   */
-  fingerprintOptions?: FingerprintOptions
-
-  /**
-   * Options for test matching
-   */
-  matcherOptions?: Partial<MatcherOptions>
-
-  /**
-   * Whether to save the registry after each test run
-   * @default true
-   */
-  autoSave?: boolean
-
-  /**
-   * Whether to cleanup orphaned UUIDs after test runs
-   * @default true
-   */
-  autoCleanup?: boolean
-
-  /**
-   * Enable debug logging
-   * @default false
-   */
-  debug?: boolean
-}
+type PluginOptions = TestIdPluginOptions
 
 interface ExtendedTest extends Test {
   testUuid?: string

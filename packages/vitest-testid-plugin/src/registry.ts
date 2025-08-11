@@ -2,18 +2,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
 import { randomUUID } from 'crypto'
 
-export interface TestEntry {
-  uuid: string
-  hash: string
-  lastNodeId: string
-  bodyLength: number
-  createdAt: number
-  lastSeen: number
-}
-
-export interface Registry {
-  [uuid: string]: Omit<TestEntry, 'uuid'>
-}
+import type { TestEntry, Registry } from '@vitest-testid/types'
 
 export class TestRegistry {
   private registry: Registry = {}
@@ -46,31 +35,33 @@ export class TestRegistry {
   }
 
   findByHash(hash: string): TestEntry | undefined {
-    for (const [uuid, entry] of Object.entries(this.registry)) {
+    for (const entry of Object.values(this.registry)) {
       if (entry.hash === hash) {
-        return { uuid, ...entry }
+        return entry
       }
     }
     return undefined
   }
 
   findByUuid(uuid: string): TestEntry | undefined {
-    const entry = this.registry[uuid]
-    return entry ? { uuid, ...entry } : undefined
+    return this.registry[uuid]
   }
 
   add(hash: string, nodeId: string, bodyLength: number): string {
     const uuid = randomUUID()
     const now = Date.now()
     
-    this.registry[uuid] = {
+    const entry: TestEntry = {
+      uuid,
+      nodeId,
       hash,
-      lastNodeId: nodeId,
       bodyLength,
-      createdAt: now,
+      timestamp: now,
+      lastNodeId: nodeId,
       lastSeen: now
     }
     
+    this.registry[uuid] = entry
     return uuid
   }
 
@@ -78,17 +69,16 @@ export class TestRegistry {
     const entry = this.registry[uuid]
     if (entry) {
       entry.hash = hash
-      entry.lastNodeId = nodeId
+      entry.nodeId = nodeId
       entry.bodyLength = bodyLength
+      entry.lastNodeId = nodeId
       entry.lastSeen = Date.now()
+      entry.timestamp = Date.now()
     }
   }
 
   getAllEntries(): TestEntry[] {
-    return Object.entries(this.registry).map(([uuid, entry]) => ({
-      uuid,
-      ...entry
-    }))
+    return Object.entries(this.registry).map(([_, entry]) => entry)
   }
 
   getAllHashes(): string[] {

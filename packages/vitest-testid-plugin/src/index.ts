@@ -1,6 +1,6 @@
 // Main plugin export
 export { default as testIdPlugin } from './plugin'
-export type { PluginOptions } from './plugin'
+export type { TestIdPluginOptions as PluginOptions } from '@vitest-testid/types'
 
 // Reporter for UUID-based test results
 export { UuidReporter, createUuidReporter } from './reporter'
@@ -12,13 +12,9 @@ export { TestRegistry } from './registry'
 export { TestMatcher } from './matcher'
 export type { 
   TestFunction, 
-  FingerprintOptions 
-} from './fingerprint'
-export type { 
+  FingerprintOptions,
   TestEntry, 
-  Registry 
-} from './registry'
-export type { 
+  Registry,
   MatchResult, 
   MatcherOptions 
-} from './matcher'
+} from '@vitest-testid/types'
