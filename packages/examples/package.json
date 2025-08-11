@@ -1,5 +1,5 @@
 {
-  "name": "@vitest-testid-plugin/examples",
+  "name": "@vitest-observability/examples",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -7,7 +7,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "vitest-testid-plugin": "workspace:*"
+    "@vitest-observability/plugin": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.2",

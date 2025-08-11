@@ -4,8 +4,8 @@ import { Command } from 'commander'
 const program = new Command()
 
 program
-  .name('vitest-testid')
-  .description('CLI for managing test identities')
+  .name('vitest-observability')
+  .description('CLI for managing test observability')
   .version('0.1.0')
 
 program

@@ -1,7 +1,7 @@
 {
-  "name": "@vitest-testid/types",
+  "name": "@vitest-observability/types",
   "version": "0.0.1",
-  "description": "Types for vitest-testid packages",
+  "description": "Types for vitest-observability packages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

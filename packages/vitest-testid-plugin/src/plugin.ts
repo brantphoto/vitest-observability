@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 import { TestFingerprinter } from './fingerprint'
 import { TestRegistry } from './registry'
 import { TestMatcher } from './matcher'
-import type { TestIdPluginOptions } from '@vitest-testid/types'
+import type { TestIdPluginOptions } from '@vitest-observability/types'
 
 type PluginOptions = TestIdPluginOptions
 

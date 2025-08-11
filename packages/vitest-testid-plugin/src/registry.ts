@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
 import { randomUUID } from 'crypto'
 
-import type { TestEntry, Registry } from '@vitest-testid/types'
+import type { TestEntry, Registry } from '@vitest-observability/types'
 
 export class TestRegistry {
   private registry: Registry = {}

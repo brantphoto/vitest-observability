@@ -1,6 +1,6 @@
 // Main plugin export
 export { default as testIdPlugin } from './plugin'
-export type { TestIdPluginOptions as PluginOptions } from '@vitest-testid/types'
+export type { TestIdPluginOptions as PluginOptions } from '@vitest-observability/types'
 
 // Core components for advanced usage
 export { TestFingerprinter } from './fingerprint'
@@ -13,4 +13,4 @@ export type {
   Registry,
   MatchResult, 
   MatcherOptions 
-} from '@vitest-testid/types'
+} from '@vitest-observability/types'

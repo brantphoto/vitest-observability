@@ -1,5 +1,5 @@
 {
-  "name": "vitest-testid-plugin",
+  "name": "@vitest-observability/plugin",
   "version": "0.1.0",
   "description": "Vitest plugin for persistent test identity tracking using content fingerprints",
   "main": "./dist/index.js",
@@ -14,7 +14,7 @@
     }
   },
   "bin": {
-    "vitest-testid": "./dist/cli.js"
+    "vitest-observability": "./dist/cli.js"
   },
   "files": [
     "dist"
@@ -49,7 +49,7 @@
     "vitest": "^1.0.0"
   },
   "dependencies": {
-    "@vitest-testid/types": "workspace:*",
+    "@vitest-observability/types": "workspace:*",
     "acorn": "^8.11.0",
     "commander": "^11.0.0"
   },

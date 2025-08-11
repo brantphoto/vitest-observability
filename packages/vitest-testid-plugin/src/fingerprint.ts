@@ -1,7 +1,7 @@
 import { parse } from 'acorn'
 import { createHash } from 'crypto'
 
-import type { TestFunction, FingerprintOptions } from '@vitest-testid/types'
+import type { TestFunction, FingerprintOptions } from '@vitest-observability/types'
 
 export class TestFingerprinter {
   private options: Required<FingerprintOptions>

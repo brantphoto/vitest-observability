@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config'
-import { testIdPlugin } from '../vitest-testid-plugin/src/index'
-import { createUuidReporter } from '../vitest-uuid-reporter/src/index'
+import { testIdPlugin } from '@vitest-observability/plugin'
+import { createUuidReporter } from '@vitest-observability/reporter'
 
 export default defineConfig({
   plugins: [

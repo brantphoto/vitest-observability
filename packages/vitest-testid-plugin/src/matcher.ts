@@ -1,6 +1,6 @@
 import { TestFingerprinter } from './fingerprint'
 import { TestRegistry } from './registry'
-import type { TestFunction, TestEntry, MatchResult, MatcherOptions } from '@vitest-testid/types'
+import type { TestFunction, TestEntry, MatchResult, MatcherOptions } from '@vitest-observability/types'
 
 export class TestMatcher {
   private fingerprinter: TestFingerprinter

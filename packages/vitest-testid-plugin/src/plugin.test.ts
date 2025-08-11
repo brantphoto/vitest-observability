@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { unlinkSync, existsSync } from 'fs'
 import testIdPlugin from './plugin'
-import type { TestIdPluginOptions } from '@vitest-testid/types'
+import type { TestIdPluginOptions } from '@vitest-observability/types'
 import type { File, Test } from 'vitest'
 
 // Mock dependencies

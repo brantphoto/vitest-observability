@@ -23,7 +23,7 @@ importers:
 
   packages/examples:
     dependencies:
-      vitest-testid-plugin:
+      '@vitest-observability/plugin':
         specifier: workspace:*
         version: link:../vitest-testid-plugin
     devDependencies:
@@ -36,7 +36,7 @@ importers:
 
   packages/vitest-testid-plugin:
     dependencies:
-      '@vitest-testid/types':
+      '@vitest-observability/types':
         specifier: workspace:*
         version: link:../vitest-testid-types
       acorn:
