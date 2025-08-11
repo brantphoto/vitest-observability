@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { unlinkSync, existsSync } from 'fs'
 import testIdPlugin from './plugin'
-import { UuidReporter } from './reporter'
+import { UuidReporter } from '../../vitest-uuid-reporter/src/reporter'
 import type { File, Test } from 'vitest'
 
 // Mock fs

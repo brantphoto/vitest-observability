@@ -1,7 +1,7 @@
 {
-  "name": "vitest-testid-plugin",
+  "name": "vitest-uuid-reporter",
   "version": "0.1.0",
-  "description": "Vitest plugin for persistent test identity tracking using content fingerprints",
+  "description": "UUID-based test reporter for Vitest with multiple output formats",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -12,9 +12,6 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
-  },
-  "bin": {
-    "vitest-testid": "./dist/cli.js"
   },
   "files": [
     "dist"
@@ -31,27 +28,23 @@
   },
   "keywords": [
     "vitest",
-    "plugin",
-    "test",
-    "identity",
+    "reporter",
     "uuid",
-    "fingerprint",
+    "test",
+    "results",
+    "json",
+    "xml",
+    "csv",
     "analytics"
   ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/acorn": "^4.0.6",
     "@vitest/coverage-v8": "^1.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
-  },
-  "dependencies": {
-    "@vitest-testid/types": "workspace:*",
-    "acorn": "^8.11.0",
-    "commander": "^11.0.0"
   },
   "peerDependencies": {
     "vitest": ">=1.0.0"

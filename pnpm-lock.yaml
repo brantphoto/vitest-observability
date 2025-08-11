@@ -74,6 +74,24 @@ importers:
         specifier: ^5.0.0
         version: 5.9.2
 
+  packages/vitest-uuid-reporter:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.10
+      '@vitest/coverage-v8':
+        specifier: ^1.0.0
+        version: 1.6.1(vitest@1.6.1(@types/node@20.19.10))
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.0(postcss@8.5.6)(typescript@5.9.2)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.2
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@20.19.10)
+
 packages:
 
   '@ampproject/remapping@2.3.0':

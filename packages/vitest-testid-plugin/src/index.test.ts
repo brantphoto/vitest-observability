@@ -7,12 +7,6 @@ describe('Index exports', () => {
     expect(typeof testIdPlugin).toBe('function')
   })
 
-  it('should export reporter components', async () => {
-    const { UuidReporter, createUuidReporter } = await import('./index')
-    expect(UuidReporter).toBeDefined()
-    expect(createUuidReporter).toBeDefined()
-    expect(typeof createUuidReporter).toBe('function')
-  })
 
   it('should export core components', async () => {
     const { TestFingerprinter, TestRegistry, TestMatcher } = await import('./index')
@@ -30,8 +24,6 @@ describe('Index exports', () => {
     // Check that we can import types (they exist at compile time)
     const exportedNames = Object.keys(module)
     expect(exportedNames).toContain('testIdPlugin')
-    expect(exportedNames).toContain('UuidReporter')
-    expect(exportedNames).toContain('createUuidReporter')
     expect(exportedNames).toContain('TestFingerprinter')
     expect(exportedNames).toContain('TestRegistry')
     expect(exportedNames).toContain('TestMatcher')
@@ -48,17 +40,6 @@ describe('Index exports', () => {
     expect(plugin.onFinished).toBeDefined()
   })
 
-  it('should allow reporter instantiation', async () => {
-    const { UuidReporter, createUuidReporter } = await import('./index')
-    
-    // Test class instantiation
-    const reporter1 = new UuidReporter()
-    expect(reporter1).toBeInstanceOf(UuidReporter)
-    
-    // Test factory function
-    const reporter2 = createUuidReporter()
-    expect(reporter2).toBeInstanceOf(UuidReporter)
-  })
 
   it('should allow core component instantiation', async () => {
     const { TestFingerprinter, TestRegistry, TestMatcher } = await import('./index')
