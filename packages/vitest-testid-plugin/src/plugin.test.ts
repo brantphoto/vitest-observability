@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { unlinkSync, existsSync } from 'fs'
-import testIdPlugin, { PluginOptions } from './plugin'
+import testIdPlugin from './plugin'
+import type { TestIdPluginOptions } from '@vitest-testid/types'
 import type { File, Test } from 'vitest'
 
 // Mock dependencies
@@ -45,7 +46,7 @@ describe('testIdPlugin', () => {
     })
 
     it('should create plugin with custom options', () => {
-      const options: PluginOptions = {
+      const options: TestIdPluginOptions = {
         registryPath: '.custom-registry.json',
         debug: true,
         autoSave: false,
@@ -96,14 +97,14 @@ describe('testIdPlugin', () => {
         name: 'should add numbers',
         type: 'test',
         mode: 'run',
-        tasks: [],
         suite: undefined as any,
         file: undefined as any,
         meta: {},
         each: undefined,
         fails: false,
         retry: 0,
-        repeats: 0
+        repeats: 0,
+        context: {} as any
       }
 
       const mockTest2: Test = {
@@ -111,14 +112,14 @@ describe('testIdPlugin', () => {
         name: 'should multiply numbers', 
         type: 'test',
         mode: 'run',
-        tasks: [],
         suite: undefined as any,
         file: undefined as any,
         meta: {},
         each: undefined,
         fails: false,
         retry: 0,
-        repeats: 0
+        repeats: 0,
+        context: {} as any
       }
 
       const mockFile: File = {
@@ -132,9 +133,9 @@ describe('testIdPlugin', () => {
         file: undefined as any,
         meta: {},
         each: undefined,
-        fails: false,
         retry: 0,
-        repeats: 0
+        repeats: 0,
+        projectName: 'test-project'
       }
 
       // Set up parent relationships
@@ -180,9 +181,9 @@ describe('testIdPlugin', () => {
         file: undefined as any,
         meta: {},
         each: undefined,
-        fails: false,
         retry: 0,
-        repeats: 0
+        repeats: 0,
+        projectName: 'test-project'
       }
 
       const taskUpdates: [string, any, any][] = [
@@ -237,9 +238,9 @@ describe('testIdPlugin', () => {
         file: undefined as any,
         meta: {},
         each: undefined,
-        fails: false,
         retry: 0,
-        repeats: 0
+        repeats: 0,
+        projectName: 'test-project'
       }
 
       const taskUpdates: [string, any, any][] = [
@@ -264,13 +265,13 @@ describe('testIdPlugin', () => {
         type: 'test',
         mode: 'run',
         file: undefined, // Missing file property
-        tasks: [],
         suite: undefined as any,
         meta: {},
         each: undefined,
         fails: false,
         retry: 0,
-        repeats: 0
+        repeats: 0,
+        context: {} as any
       }
 
       const taskUpdates: [string, any, any][] = [
@@ -342,9 +343,9 @@ describe('testIdPlugin', () => {
         file: undefined as any,
         meta: {},
         each: undefined,
-        fails: false,
         retry: 0,
-        repeats: 0
+        repeats: 0,
+        projectName: 'test-project'
       }
 
       const taskUpdates: [string, any, any][] = [

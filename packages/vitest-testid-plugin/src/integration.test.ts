@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { unlinkSync, existsSync } from 'fs'
 import testIdPlugin from './plugin'
 import { UuidReporter } from '../../vitest-uuid-reporter/src/reporter'
-import type { File, Test } from 'vitest'
+import type { File, Test, TaskState } from 'vitest'
 
 // Mock fs
 vi.mock('fs', async () => {
@@ -82,14 +82,14 @@ describe('Plugin + Reporter Integration', () => {
       name: 'should calculate sum correctly',
       type: 'test',
       mode: 'run',
-      tasks: [],
       suite: undefined as any,
       file: undefined as any,
       meta: {},
       each: undefined,
       fails: false,
       retry: 0,
-      repeats: 0
+      repeats: 0,
+      context: {} as any
     }
 
     const mockTest2: Test = {
@@ -97,14 +97,14 @@ describe('Plugin + Reporter Integration', () => {
       name: 'should handle string operations',
       type: 'test',
       mode: 'run',
-      tasks: [],
       suite: undefined as any,
       file: undefined as any,
       meta: {},
       each: undefined,
       fails: false,
       retry: 0,
-      repeats: 0
+      repeats: 0,
+      context: {} as any
     }
 
     const mockFile: File = {
@@ -118,9 +118,9 @@ describe('Plugin + Reporter Integration', () => {
       file: undefined as any,
       meta: {},
       each: undefined,
-      fails: false,
       retry: 0,
-      repeats: 0
+      repeats: 0,
+      projectName: 'test-project'
     }
 
     // Set up parent relationships
@@ -145,7 +145,7 @@ describe('Plugin + Reporter Integration', () => {
     // Step 2: Create test results for reporter (simulate test completion)
     const mockTest1WithResult = {
       ...mockTest1,
-      state: 'pass',
+      state: 'pass' as TaskState,
       duration: 50,
       startTime: Date.now(),
       retryCount: 0,
@@ -154,7 +154,7 @@ describe('Plugin + Reporter Integration', () => {
 
     const mockTest2WithResult = {
       ...mockTest2,  
-      state: 'pass',
+      state: 'pass' as TaskState,
       duration: 75,
       startTime: Date.now(),
       retryCount: 0,
@@ -162,9 +162,9 @@ describe('Plugin + Reporter Integration', () => {
     }
 
     // Step 3: Reporter processes results with UUIDs
-    const reporterUpdates: [string, any][] = [
-      ['test1', mockTest1WithResult],
-      ['test2', mockTest2WithResult]
+    const reporterUpdates: [string, any, any][] = [
+      ['test1', mockTest1WithResult, {}],
+      ['test2', mockTest2WithResult, {}]
     ]
     
     reporter.onTaskUpdate(reporterUpdates)
@@ -196,7 +196,7 @@ describe('Plugin + Reporter Integration', () => {
       uuid: (mockTest1 as any).testUuid,
       fingerprint: (mockTest1 as any).testFingerprint,
       name: 'should calculate sum correctly',
-      state: 'pass',
+      state: 'pass' as TaskState,
       duration: 50
     })
 
@@ -206,7 +206,7 @@ describe('Plugin + Reporter Integration', () => {
       uuid: (mockTest2 as any).testUuid,
       fingerprint: (mockTest2 as any).testFingerprint,
       name: 'should handle string operations',
-      state: 'pass',
+      state: 'pass' as TaskState,
       duration: 75
     })
   })
@@ -230,14 +230,14 @@ describe('Plugin + Reporter Integration', () => {
       name: 'demo test',
       type: 'test',
       mode: 'run',
-      tasks: [],
       suite: undefined as any,
       file: undefined as any,
       meta: {},
       each: undefined,
       fails: false,
       retry: 0,
-      repeats: 0
+      repeats: 0,
+      context: {} as any
     }
 
     const mockFile: File = {
@@ -251,9 +251,9 @@ describe('Plugin + Reporter Integration', () => {
       file: undefined as any,
       meta: {},
       each: undefined,
-      fails: false,
       retry: 0,
-      repeats: 0
+      repeats: 0,
+      projectName: 'test-project'
     }
 
     mockTest.suite = mockFile
@@ -295,12 +295,12 @@ describe('Plugin + Reporter Integration', () => {
       mode: 'run'
     } as any
 
-    const testWithUuidAndResult = { ...testWithUuid, name: 'test with uuid', state: 'pass' }
-    const testWithoutUuidAndResult = { ...testWithoutUuid, name: 'test without uuid', state: 'pass' }
+    const testWithUuidAndResult = { ...testWithUuid, name: 'test with uuid', state: 'pass' as TaskState }
+    const testWithoutUuidAndResult = { ...testWithoutUuid, name: 'test without uuid', state: 'pass' as TaskState }
 
     reporter.onTaskUpdate([
-      ['test-with-uuid', testWithUuidAndResult],
-      ['test-without-uuid', testWithoutUuidAndResult]
+      ['test-with-uuid', testWithUuidAndResult, {}],
+      ['test-without-uuid', testWithoutUuidAndResult, {}]
     ])
 
     await reporter.onFinished([], [])

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { existsSync, unlinkSync } from 'fs'
 import { UuidReporter, createUuidReporter } from './reporter'
-import type { Task, TestResult } from 'vitest'
+import type { Task, TaskResult, TaskState } from 'vitest'
 
 // Mock fs/promises
 vi.mock('fs/promises', () => ({
@@ -64,19 +64,19 @@ describe('UuidReporter', () => {
       const mockTaskWithResult = {
         ...mockTask,
         name: 'should work',
-        state: 'pass',
+        state: 'pass' as TaskState as TaskState,
         duration: 100,
         startTime: Date.now()
       }
 
-      reporter.onTaskUpdate([['test1', mockTaskWithResult]])
+      reporter.onTaskUpdate([['test1', mockTaskWithResult, {}]])
 
       // Access private results through type casting for testing
       const results = (reporter as any).results as Map<string, any>
       expect(results.size).toBe(1)
       expect(results.get('uuid-123')).toEqual({
         name: 'should work',
-        state: 'pass',
+        state: 'pass' as TaskState,
         duration: 100,
         startTime: expect.any(Number),
         errors: [],
@@ -100,17 +100,17 @@ describe('UuidReporter', () => {
       const mockTaskWithResult = {
         ...mockTask,
         name: 'test without uuid',
-        state: 'pass',
+        state: 'pass' as TaskState,
         duration: 50
       }
 
-      reporter.onTaskUpdate([['test2', mockTaskWithResult]])
+      reporter.onTaskUpdate([['test2', mockTaskWithResult, {}]])
 
       const results = (reporter as any).results as Map<string, any>
       expect(results.size).toBe(1)
       expect(results.get('test2')).toEqual({
         name: 'test without uuid',
-        state: 'pass',
+        state: 'pass' as TaskState,
         duration: 50,
         startTime: 0,
         errors: [],
@@ -131,13 +131,12 @@ describe('UuidReporter', () => {
         mode: 'run'
       } as any
 
-      const mockResult: TestResult = {
-        name: 'test without uuid',
-        state: 'pass',
+      const mockResult: TaskResult = {
+        state: 'pass' as TaskState,
         duration: 50
-      } as any
+      }
 
-      reporter.onTaskUpdate([['test3', mockTask, mockResult]])
+      reporter.onTaskUpdate([['test3', { ...mockTask, ...mockResult }, {}]])
 
       const results = (reporter as any).results as Map<string, any>
       expect(results.size).toBe(0)
@@ -154,10 +153,10 @@ describe('UuidReporter', () => {
       const mockSuiteWithResult = {
         ...mockSuite,
         name: 'test suite',
-        state: 'pass'
+        state: 'pass' as TaskState
       }
 
-      reporter.onTaskUpdate([['suite1', mockSuiteWithResult]])
+      reporter.onTaskUpdate([['suite1', mockSuiteWithResult, {}]])
 
       const results = (reporter as any).results as Map<string, any>
       expect(results.size).toBe(0)
@@ -186,14 +185,14 @@ describe('UuidReporter', () => {
       const mockTaskWithResult = {
         ...mockTask,
         name: 'json test',
-        state: 'pass',
+        state: 'pass' as TaskState,
         duration: 150,
         startTime: 1640995200000,
         retryCount: 0,
         errors: []
       }
 
-      reporter.onTaskUpdate([['test1', mockTaskWithResult]])
+      reporter.onTaskUpdate([['test1', mockTaskWithResult, {}]])
 
       const output = (reporter as any).formatOutput([], [], 1000)
       const parsed = JSON.parse(output)
@@ -205,7 +204,7 @@ describe('UuidReporter', () => {
         uuid: 'json-uuid-123',
         fingerprint: 'json-fingerprint',
         name: 'json test',
-        state: 'pass',
+        state: 'pass' as TaskState,
         duration: 150,
         retryCount: 0
       })
@@ -226,12 +225,12 @@ describe('UuidReporter', () => {
       const mockTaskWithResult = {
         ...mockTask,
         name: 'xml test',
-        state: 'fail',
+        state: 'fail' as TaskState,
         duration: 200,
         errors: [{ message: 'Test failed', stack: 'Error stack', name: 'AssertionError' }]
       }
 
-      reporter.onTaskUpdate([['test1', mockTaskWithResult]])
+      reporter.onTaskUpdate([['test1', mockTaskWithResult, {}]])
 
       const output = (reporter as any).formatOutput([], [], 1500)
       
@@ -258,12 +257,12 @@ describe('UuidReporter', () => {
       const mockTaskWithResult = {
         ...mockTask,
         name: 'csv test',
-        state: 'pass',
+        state: 'pass' as TaskState,
         duration: 75,
         errors: []
       }
 
-      reporter.onTaskUpdate([['test1', mockTaskWithResult]])
+      reporter.onTaskUpdate([['test1', mockTaskWithResult, {}]])
 
       const output = (reporter as any).formatOutput([], [], 800)
       const lines = output.split('\n')
@@ -311,7 +310,7 @@ describe('UuidReporter', () => {
       const mockTaskWithResult = {
         ...mockTask,
         name: 'failing test',
-        state: 'fail',
+        state: 'fail' as TaskState,
         duration: 200,
         errors: [
           { message: 'Expected true but got false', stack: 'at test line 1', name: 'AssertionError' },
@@ -319,7 +318,7 @@ describe('UuidReporter', () => {
         ]
       }
 
-      reporter.onTaskUpdate([['failing-test', mockTaskWithResult]])
+      reporter.onTaskUpdate([['failing-test', mockTaskWithResult, {}]])
 
       const output = (reporter as any).formatOutput([], [], 1000)
       const parsed = JSON.parse(output)
@@ -359,14 +358,14 @@ describe('UuidReporter', () => {
       const mockTaskWithResult = {
         ...mockTask,
         name: 'integration test',
-        state: 'pass',
+        state: 'pass' as TaskState,
         duration: 100,
         startTime: Date.now(),
         retryCount: 0,
         errors: []
       }
 
-      reporter.onTaskUpdate([['integration-test', mockTaskWithResult]])
+      reporter.onTaskUpdate([['integration-test', mockTaskWithResult, {}]])
 
       // Finish and verify file was written
       await reporter.onFinished([], [])
