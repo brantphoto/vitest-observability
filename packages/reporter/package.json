@@ -1,11 +1,10 @@
 {
   "name": "@vitest-observability/reporter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "UUID-based test reporter for Vitest with multiple output formats",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

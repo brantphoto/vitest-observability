@@ -1,11 +1,10 @@
 {
   "name": "@vitest-observability/plugin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Vitest plugin for persistent test identity tracking using content fingerprints",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
