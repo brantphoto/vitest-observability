@@ -1,7 +1,7 @@
 {
   "name": "@vitest-observability/examples",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.1",
   "scripts": {
     "test": "vitest --run",
     "typecheck": "tsc --noEmit"
@@ -13,5 +13,8 @@
   "devDependencies": {
     "typescript": "^5.9.2",
     "vitest": "^1.6.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
